@@ -97,15 +97,12 @@ TODO: replace this with an actual diagram image once the system is built (Day 6)
 
 ## Dataset
 
-Not picked yet. Planning to use a public fraud dataset (Kaggle credit card fraud or IEEE-CIS,
-haven't decided). Will fill this in once it's downloaded and I've looked at it.
-
-- Source: TODO
-- Size: TODO
-- Label distribution (fraud %): TODO
-- Key features: TODO
-- License notes: TODO
-- EDA notebook: [`notebooks/01_eda.ipynb`](./notebooks/01_eda.ipynb) (not started)
+- Source: [Kaggle - Credit Card Fraud Detection (mlg-ulb)](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud)
+- Size: 284807 rows, 31 columns
+- Label distribution: 0.1727% fraudulent / 99.8273% non-fraudulent (highly imbalanced)
+- Key features: `Time`, `Amount`, `V1`-`V28` (PCA-anonymized features), `Class` (target)
+- License / usage notes: Public Kaggle dataset, for research/educational use. Features `V1`-`V28` are already PCA-transformed and anonymized by the dataset provider - no access to the original raw features.
+- EDA notebook: [`notebooks/01_eda.ipynb`](./notebooks/01_eda.ipynb)
 
 ---
 
