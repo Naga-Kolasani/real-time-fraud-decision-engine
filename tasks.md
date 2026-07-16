@@ -8,26 +8,26 @@
 ## Day 1 - Setup, dataset, architecture
 
 **Env**
-- [ ] 🔴 GitHub repo created, cloned locally
-- [ ] 🔴 venv set up, Python 3.11+
-- [ ] 🔴 requirements.txt installed, imports verified
+- [x] 🔴 GitHub repo created, cloned locally
+- [x] 🔴 venv set up, Python 3.11+
+- [x] 🔴 requirements.txt installed, imports verified
 
 **Scaffold**
-- [ ] 🔴 Folder structure (`notebooks/`, `src/{data,models,api,monitoring}/`, `tests/`,
+- [x] 🔴 Folder structure (`notebooks/`, `src/{data,models,api,monitoring}/`, `tests/`,
   `docker/`, `artifacts/`) - `needs:` env
-- [ ] 🔴 `__init__.py` files where needed
-- [ ] 🔴 `.gitignore`
+- [x] 🔴 `__init__.py` files where needed
+- [x] 🔴 `.gitignore`
 
 **Dataset**
-- [ ] 🔴 Pick a dataset (leaning Kaggle credit card fraud, might switch to IEEE-CIS)
-- [ ] 🔴 Download it, keep it out of git
-- [ ] 🔴 `01_eda.ipynb`: shape, columns, label balance, missing values - `needs:` dataset
-- [ ] 🔴 Note dataset source in README
+- [x] 🔴 Pick a dataset (leaning Kaggle credit card fraud, might switch to IEEE-CIS)
+- [x] 🔴 Download it, keep it out of git
+- [x] 🔴 `01_eda.ipynb`: shape, columns, label balance, missing values - `needs:` dataset
+- [x] 🔴 Note dataset source in README
 
 **Docs**
-- [ ] 🔴 `ARCHITECTURE.md` - problem framing, flow, success criteria
-- [ ] 🔴 Success criteria written down (target PR-AUC range, <50ms latency budget)
-- [ ] 🔴 This file
+- [x] 🔴 `ARCHITECTURE.md` - problem framing, flow, success criteria
+- [x] 🔴 Success criteria written down (target PR-AUC range, <50ms latency budget)
+- [x] 🔴 This file
 
 **Done when:** repo pushed, env works, dataset loaded with basic stats, ARCHITECTURE.md and
 tasks.md exist.
@@ -37,22 +37,22 @@ tasks.md exist.
 ## Day 2 - Data prep, baseline model
 
 **EDA**
-- [ ] 🔴 Feature distributions in `01_eda.ipynb` - `needs:` Day 1 dataset
-- [ ] 🔴 Missing values / data quality check
-- [ ] 🔴 Class imbalance visualized
-- [ ] 🔴 Decide train/val/test split (stratified)
+- [x] 🔴 Feature distributions in `01_eda.ipynb` - `needs:` Day 1 dataset
+- [x] 🔴 Missing values / data quality check
+- [x] 🔴 Class imbalance visualized
+- [x] 🔴 Decide train/val/test split (stratified)
 
 **Pipeline**
-- [ ] 🔴 `src/data/load_data.py` - `needs:` dataset picked
-- [ ] 🔴 `src/data/preprocess.py` - scaling/encoding
-- [ ] 🔴 Wrap into one sklearn `Pipeline` object - `needs:` preprocess.py
+- [x] 🔴 `src/data/load_data.py` - `needs:` dataset picked
+- [x] 🔴 `src/data/preprocess.py` - scaling/encoding
+- [x] 🔴 Wrap into one sklearn `Pipeline` object - `needs:` preprocess.py
 
 **Baseline**
-- [ ] 🔴 Logistic regression baseline in `02_modeling.ipynb` - `needs:` pipeline
-- [ ] 🔴 XGBoost as the "real" model
-- [ ] 🔴 Handle imbalance (class weights, or imbalanced-learn if needed)
-- [ ] 🔴 Evaluate: precision, recall, F1, PR-AUC, confusion matrix
-- [ ] 🔴 Save metrics + model artifact to `artifacts/models/`
+- [x] 🔴 Logistic regression baseline in `02_modeling.ipynb` - `needs:` pipeline
+- [x] 🔴 XGBoost as the "real" model
+- [x] 🔴 Handle imbalance (class weights, or imbalanced-learn if needed)
+- [x] 🔴 Evaluate: precision, recall, F1, PR-AUC, confusion matrix
+- [x] 🔴 Save metrics + model artifact to `artifacts/models/`
 
 **Done when:** preprocess.py works, baseline + XGBoost trained, notebook has metrics/plots,
 first model saved.

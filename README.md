@@ -4,9 +4,6 @@ Local fraud detection project. Goal is to train a model on transaction data, ser
 FastAPI endpoint, and turn the model's fraud probability into a 3-way decision: approve,
 review, or block.
 
-Status: Day 1, just getting the scaffold and docs in place. Most sections below are still
-placeholders - I'll fill them in as the actual work gets done.
-
 See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for the design and [`tasks.md`](./tasks.md) for
 the day-by-day plan.
 
@@ -108,20 +105,36 @@ TODO: replace this with an actual diagram image once the system is built (Day 6)
 
 ## Model Training
 
-Nothing trained yet. Table below to fill in once I have real numbers from Day 2/3.
+Trained two initial models on the Kaggle credit card fraud dataset:
+- Logistic Regression with `class_weight="balanced"` as the simple baseline
+- XGBoost as the stronger tree-based model
+
+Because the dataset is extremely imbalanced, PR-AUC matter more than plain accuracy, so that's the main number I'm using to compare models right now.
 
 | Model | Precision | Recall | F1 | PR-AUC |
 |---|---|---|---|---|
-| Logistic Regression (baseline) | TBD | TBD | TBD | TBD |
-| XGBoost (tuned) | TBD | TBD | TBD | TBD |
+| Logistic Regression (baseline) | 0.0626 | 0.9082 | 0.1172 | 0.7190 |
+| XGBoost (tuned) | 0.7568 | 0.8571 | 0.8038 | 0.8688 |
 
-- Class imbalance handling: TODO (probably class weights first, imbalanced-learn if that's
-  not enough)
-- Decision thresholds: TODO - will document the reasoning once picked, not just the numbers
-- Explainability: SHAP, planned for Day 3
-- Experiment tracking: MLflow, planned for Day 5 (runs stored locally in `mlruns/`, not
-  committed to git)
-- Notebook: [`notebooks/02_modeling.ipynb`](./notebooks/02_modeling.ipynb) (not started)
+A few takeaways from the first run:
+- Logistic Regression finds most fraud cases, but it throws way too many false positives.
+- XGBoost is much more usable as a starting point: recall is still strong, precision is dramatically better, and it wins clearly on PR-AUC.
+- So for now, XGBoost is the saved model artifact for v1.
+
+Current implementation notes:
+- Class imbalance handling:
+    - Logistic Regression uses `class_weight="balanced"`
+    - XGBoost uses `scale_pos_weight` based on the training split
+- Decision thresholds:
+    - These metrics are still using the model's default classification threshold
+    - I haven't picked the final approve / review / block thresholds (`T1`, `T2`) yet, that's next.
+- Explainability:
+    - SHAP is still planned for the next pass
+- Experiment tracking:
+    - MLflow, planned for Day 5 (runs stored locally in `mlruns/`, not committed to git)
+- Training code: [`src/models/train.py`](./src/models/train.py)
+
+I still want to add a proper modeling notebook and threshold analysis, but the basic training pipeline is working now and producing a model artifact end to end.
 
 ---
 
@@ -225,8 +238,8 @@ Then open `http://localhost:5000`. (Nothing tracked yet.)
 Full task breakdown in [`tasks.md`](./tasks.md). Where things stand:
 
 - [x] Day 1: repo scaffold, requirements.txt, README/ARCHITECTURE/tasks docs
-- [ ] Day 1: pick dataset, download it, basic EDA
-- [ ] Day 2: preprocessing pipeline + baseline model
+- [x] Day 1: pick dataset, download it, basic EDA
+- [x] Day 2: preprocessing pipeline + baseline model
 - [ ] Day 3: tuned model, thresholds, SHAP
 - [ ] Day 4: FastAPI service
 - [ ] Day 5: MLflow, Docker, monitoring
