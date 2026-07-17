@@ -1,11 +1,8 @@
 # Real-Time AI Fraud Decision Engine
 
-Local fraud detection project. Goal is to train a model on transaction data, serve it through a
-FastAPI endpoint, and turn the model's fraud probability into a 3-way decision: approve,
-review, or block.
+Local fraud detection project. Goal is to train a model on transaction data, serve it through a FastAPI endpoint, and turn the model's fraud probability into a 3-way decision: approve, review, or block.
 
-See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for the design and [`tasks.md`](./tasks.md) for
-the day-by-day plan.
+See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for the design and [`tasks.md`](./tasks.md) for the day-by-day plan.
 
 ---
 
@@ -27,32 +24,24 @@ the day-by-day plan.
 ## Overview
 
 The idea: build a small end-to-end fraud scoring system, not just a model in a notebook.
-Data pipeline, trained model, an API that serves it, some experiment tracking, a Dockerfile,
-and basic logging/drift checks. Nothing fancy - the point is to have a real working system I
-can point to and explain, not a from-scratch research project.
+Data pipeline, trained model, an API that serves it, some experiment tracking, a Dockerfile, and basic logging/drift checks. Nothing fancy - the point is to have a real working system I can point to and explain, not a from-scratch research project.
 
 Rough scope:
-- Train a classifier (starting with logistic regression, then XGBoost) on a public
-  transaction dataset.
-- Serve predictions through `POST /score_transaction` in FastAPI. Aiming for well under
-  50ms per request, but I haven't measured this yet.
+- Train a classifier (starting with logistic regression, then XGBoost) on a public transaction dataset.
+- Serve predictions through `POST /score_transaction` in FastAPI. Aiming for well under 50ms per request, but I haven't measured this yet.
 - Turn the raw fraud probability into approve / review / block using two thresholds.
 - Explain predictions with SHAP (planned - not implemented yet).
 - Track training runs in MLflow.
 - Run the API in Docker.
 - Log predictions and do a basic drift check against the training data.
 
-Most of this is still TODO - see [`tasks.md`](./tasks.md) for what's actually done vs.
-planned.
+Most of this is still TODO - see [`tasks.md`](./tasks.md) for what's actually done vs. planned.
 
 ---
 
 ## Business Problem
 
-The reason for a 3-way decision instead of plain fraud/not-fraud: a single threshold forces
-every transaction into one of two buckets, but a lot of transactions aren't confidently
-either. Blocking a real customer costs you a customer. Letting real fraud through costs you
-money directly. Treating everything the same way with one cutoff ignores that.
+The reason for a 3-way decision instead of plain fraud/not-fraud: a single threshold forces every transaction into one of two buckets, but a lot of transactions aren't confidently either. Blocking a real customer costs you a customer. Letting real fraud through costs you money directly. Treating everything the same way with one cutoff ignores that.
 
 So instead of one threshold, there are two:
 
@@ -62,18 +51,15 @@ So instead of one threshold, there are two:
 | Review | Score in the middle | Gets flagged for manual review / extra auth |
 | Block | High risk score | Auto-declined |
 
-Where exactly `T1` and `T2` land isn't decided yet - that happens after I have real
-precision/recall numbers to look at (Day 3). Right now these are just placeholders in the
-design.
+Current working thresholds are `T1 = 0.10` and `T2 = 0.89`, based on the validation threshold sweep. The raw sweep suggestion for `T1` was too low to be useful in practice because it pushed almost the entire validation set into the review band, so I raised the lower cutoff to keep the 3-way policy usable.
 
 ---
 
 ## Architecture
 
-Full write-up in [`ARCHITECTURE.md`](./ARCHITECTURE.md) - components, training pipeline,
-inference flow, monitoring, and what's in scope vs. cut for later.
+Full write-up in [`ARCHITECTURE.md`](./ARCHITECTURE.md) - components, training pipeline, inference flow, monitoring, and what's in scope vs. cut for later.
 
-Rough flow (offline training → online serving):
+Rough flow (offline training -> online serving):
 
 ```
 [Raw transaction data] -> [data pipeline] -> [training pipeline] -> [saved model]
@@ -127,14 +113,15 @@ Current implementation notes:
     - XGBoost uses `scale_pos_weight` based on the training split
 - Decision thresholds:
     - These metrics are still using the model's default classification threshold
-    - I haven't picked the final approve / review / block thresholds (`T1`, `T2`) yet, that's next.
+    - Current working thresholds in `src/models/infer.py` are `T1 = 0.10` and `T2 = 0.89`
+    - These came from the validation threshold sweep, but I overrode the raw `T1 = 0.00` suggestion because it pushed almost the entire validation set into `review`
 - Explainability:
     - SHAP is still planned for the next pass
 - Experiment tracking:
     - MLflow, planned for Day 5 (runs stored locally in `mlruns/`, not committed to git)
 - Training code: [`src/models/train.py`](./src/models/train.py)
 
-I still want to add a proper modeling notebook and threshold analysis, but the basic training pipeline is working now and producing a model artifact end to end.
+The basic training pipeline is working end to end and producing a model artifact. I also have a separate threshold-sweep script now, which I used to pick the current working T1/T2 values before wiring them into inference.
 
 ---
 
@@ -189,10 +176,8 @@ curl -X POST http://localhost:8000/score_transaction \
 
 Not built yet (Day 5). Plan:
 
-- Every scored transaction gets appended to a log (CSV or SQLite, haven't decided) via
-  `src/monitoring/log_predictions.py`
-- A separate script/notebook compares recent transaction features against the training
-  distribution - either a hand-rolled check or Evidently, depending on time
+- Every scored transaction gets appended to a log (CSV or SQLite, haven't decided) via `src/monitoring/log_predictions.py`
+- A separate script/notebook compares recent transaction features against the training distribution - either a hand-rolled check or Evidently, depending on time
 - Output is a basic report/plot saved locally, screenshotted for the README later
 
 ---
@@ -240,7 +225,7 @@ Full task breakdown in [`tasks.md`](./tasks.md). Where things stand:
 - [x] Day 1: repo scaffold, requirements.txt, README/ARCHITECTURE/tasks docs
 - [x] Day 1: pick dataset, download it, basic EDA
 - [x] Day 2: preprocessing pipeline + baseline model
-- [ ] Day 3: tuned model, thresholds, SHAP
+- [x] Day 3: tuned model, SHAP, and final threshold documentation
 - [ ] Day 4: FastAPI service
 - [ ] Day 5: MLflow, Docker, monitoring
 - [ ] Day 6: docs, demo, cleanup
@@ -251,21 +236,17 @@ Full task breakdown in [`tasks.md`](./tasks.md). Where things stand:
 
 Writing this now so I remember to be upfront about it later, not just at the end:
 
-- This uses a static dataset, not an actual real-time transaction stream. "Real-time" here
-  means the API responds fast, not that it's hooked up to live data.
+- This uses a static dataset, not an actual real-time transaction stream. "Real-time" here means the API responds fast, not that it's hooked up to live data.
 - Drift monitoring is a manual/periodic check, not a live dashboard or alerting.
-- Thresholds are tuned on one dataset snapshot - would need to be re-checked against live
-  data if this were ever actually deployed.
+- Thresholds are tuned on one dataset snapshot - would need to be re-checked against live data if this were ever actually deployed.
 - No auth or rate limiting on the API. Fine for a local demo, not fine for production.
 
-See [`ARCHITECTURE.md`](./ARCHITECTURE.md#8-v1-scope-vs-stretch-scope) for what's in scope
-for this project vs. what I'm deliberately skipping.
+See [`ARCHITECTURE.md`](./ARCHITECTURE.md#8-v1-scope-vs-stretch-scope) for what's in scope for this project vs. what I'm deliberately skipping.
 
 ---
 
 ## Tech Stack
 
-Python 3.11, pandas, scikit-learn, XGBoost, imbalanced-learn, SHAP, FastAPI, Pydantic,
-MLflow, Docker, Evidently, pytest.
+Python 3.11, pandas, scikit-learn, XGBoost, imbalanced-learn, SHAP, FastAPI, Pydantic, MLflow, Docker, Evidently, pytest.
 
 Why each one is here: see [`ARCHITECTURE.md`](./ARCHITECTURE.md#10-tech-stack-rationale).
