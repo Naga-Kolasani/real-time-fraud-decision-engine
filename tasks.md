@@ -29,8 +29,7 @@
 - [x] 🔴 Success criteria written down (target PR-AUC range, <50ms latency budget)
 - [x] 🔴 This file
 
-**Done when:** repo pushed, env works, dataset loaded with basic stats, ARCHITECTURE.md and
-tasks.md exist.
+**Done when:** repo pushed, env works, dataset loaded with basic stats, ARCHITECTURE.md and tasks.md exist.
 
 ---
 
@@ -54,8 +53,7 @@ tasks.md exist.
 - [x] 🔴 Evaluate: precision, recall, F1, PR-AUC, confusion matrix
 - [x] 🔴 Save metrics + model artifact to `artifacts/models/`
 
-**Done when:** preprocess.py works, baseline + XGBoost trained, notebook has metrics/plots,
-first model saved.
+**Done when:** preprocess.py works, baseline + XGBoost trained, notebook has metrics/plots, first model saved.
 
 ---
 
@@ -66,19 +64,18 @@ first model saved.
 - [ ] 🔴 Pick final model, balancing recall vs. false positives
 
 **Thresholds**
-- [ ] 🔴 `src/models/infer.py` - risk_score from predict_proba - `needs:` final model
-- [ ] 🔴 T1/T2 threshold logic
-- [ ] 🔴 Precision/recall vs. threshold plot to back up where T1/T2 landed
+- [x] 🔴 `src/models/infer.py` - risk_score from predict_proba - `needs:` final model
+- [x] 🔴 T1/T2 threshold logic
+- [x] 🔴 Precision/recall vs. threshold plot to back up where T1/T2 landed
 
 **Explainability**
-- [ ] 🔴 SHAP global importance in `02_modeling.ipynb` - `needs:` final model
-- [ ] 🔴 Local explanations for a few sample transactions
+- [x] 🔴 SHAP global importance in `02_modeling.ipynb` - `needs:` final model
+- [x] 🔴 Local explanations for a few sample transactions
 - [ ] 🔴 Top-N feature function in `infer.py`
 - [ ] 🟡 Check if SHAP is fast enough for the latency budget, or if it needs to be
   approximated
 
-**Done when:** tuned model saved, thresholds picked and written down with reasoning,
-explainability working in the notebook, `infer.py` has the core functions.
+**Done when:** tuned model saved, thresholds picked and written down with reasoning, `infer.py` has the core functions, and explainability is working in the notebook.
 
 ---
 
