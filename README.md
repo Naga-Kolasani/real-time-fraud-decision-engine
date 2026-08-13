@@ -51,7 +51,7 @@ So instead of one threshold, there are two:
 | Review | Score in the middle | Gets flagged for manual review / extra auth |
 | Block | High risk score | Auto-declined |
 
-Current working thresholds are `T1 = 0.10` and `T2 = 0.89`, based on the validation threshold sweep. The validation sweep was used to narrow down the working thresholds. The raw `T1` suggestion was `0.00`, which would send nearly every validation transaction to review, so I set `T1 = 0.10` to preserve a usable approve/review/block policy. `T2 = 0.89` remains the stricter boundary for auto-blocking.
+Current working thresholds are `T1 = 0.10` and `T2 = 0.89`. The validation sweep was used to narrow them down, but the raw `T1 = 0.00` suggestion would have sent nearly every validation transaction to review. I set `T1 = 0.10` to keep the approve/review/block policy usable, while `T2 = 0.89` remains the stricter boundary for auto-blocking.
 
 ---
 
@@ -129,48 +129,37 @@ The basic training pipeline is working end to end and producing a model artifact
 
 ## API
 
-Not built yet (Day 4). Documenting the intended shape now so I don't drift from it later.
+Built locally and tested with FastAPI's Swagger UI, curl, and pytest.
 
 Base URL (local): `http://localhost:8000`
 
 ### `GET /health`
-Just checks the model loaded and the service is up.
+Checks that the model artifact loaded when the service started.
 
 ### `POST /score_transaction`
 
-Planned request:
+Scores one transaction and returns its fraud risk score plus an `approve`, `review`, or `block` decision.
+
+The current v1 model was trained on the Kaggle feature set, so the endpoint expects all 30 model inputs: `Time`, `Amount`, and `V1` through `V28`. A simplified transaction schema is a later cleanup item once there is a feature-building layer in front of the model.
+
+Response shape:
 ```json
 {
-  "transaction_id": "txn_123",
-  "amount": 249.99,
-  "time": "2026-07-12T14:32:00Z"
+  "risk_score": 0.000412,
+  "decision": "approve",
+  "model_name": "XGBoost",
+  "model_version": "v1",
+  "timestamp": "2026-08-13T21:27:14.489000Z"
 }
 ```
 
-Planned response:
-```json
-{
-  "transaction_id": "txn_123",
-  "risk_score": 0.87,
-  "decision": "block",
-  "top_features": [
-    {"feature": "amount", "contribution": 0.32}
-  ],
-  "model_version": "v1.0",
-  "timestamp": "2026-07-12T14:32:00Z"
-}
-```
+Run the API locally:
 
-Once it's running:
 ```bash
 uvicorn src.api.main:app --reload --port 8000
 ```
 
-```bash
-curl -X POST http://localhost:8000/score_transaction \
-  -H "Content-Type: application/json" \
-  -d '{"transaction_id": "txn_123", "amount": 249.99, "time": "2026-07-12T14:32:00Z"}'
-```
+Use the Swagger UI at `http://localhost:8000/docs` to send a real sample row from the dataset for now. The endpoint has also been tested with FastAPI's `TestClient`.
 
 ---
 
@@ -197,7 +186,7 @@ source .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 uvicorn src.api.main:app --reload --port 8000
 ```
-(API doesn't exist yet as of Day 1 - this is the intended command once it does.)
+Then open `http://localhost:8000/docs` for the interactive API docs.
 
 ### Docker
 ```bash
@@ -210,7 +199,7 @@ docker run -p 8000:8000 fraud-engine
 ```bash
 pytest tests/
 ```
-(No tests written yet.)
+Current coverage includes inference thresholds, feature-row validation, API health, a valid scoring request, and an invalid scoring request. Run `pytest tests/` to see the current test count.
 
 ### MLflow UI
 ```bash
@@ -228,7 +217,7 @@ Full task breakdown in [`tasks.md`](./tasks.md). Where things stand:
 - [x] Day 1: pick dataset, download it, basic EDA
 - [x] Day 2: preprocessing pipeline + baseline model
 - [x] Day 3: threshold analysis, inference logic, and SHAP explainability
-- [ ] Day 4: FastAPI service
+- [x] Day 4: FastAPI service
 - [ ] Day 5: MLflow, Docker, monitoring
 - [ ] Day 6: docs, demo, cleanup
 

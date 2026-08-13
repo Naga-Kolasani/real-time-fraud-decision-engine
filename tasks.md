@@ -82,14 +82,15 @@
 ## Day 4 - API
 
 **Schema**
-- [ ] 🔴 `src/api/schemas.py` - request/response fields - `needs:` Day 3 infer.py
+- [x] 🔴 `src/api/schemas.py` - request/response fields - `needs:` Day 3 infer.py
 
 **FastAPI**
-- [ ] 🔴 `src/api/main.py` - load model at startup - `needs:` Day 2-3 artifacts
-- [ ] 🔴 `GET /health`
-- [ ] 🔴 `POST /score_transaction`
-- [ ] 🔴 Test manually with curl/Postman
-- [ ] 🔴 `tests/test_inference.py`
+- [x] 🔴 `src/api/main.py` - load model at startup - `needs:` Day 2-3 artifacts
+- [x] 🔴 `GET /health`
+- [x] 🔴 `POST /score_transaction`
+- [x] 🔴 Test manually with curl/Postman
+- [x] 🔴 `tests/test_inference.py`
+- [x] 🔴 `tests/test_api.py` - health, scoring, and request validation
 - [ ] 🟡 `tests/test_data_pipeline.py`
 
 **Extra**
