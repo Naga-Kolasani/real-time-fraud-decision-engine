@@ -170,7 +170,7 @@ Day 1 (env, dataset, docs)
 
 ---
 
-## Must-have list for Saturday
+## Must-have list by Day 6
 
 - [ ] Trained model with real metrics written down
 - [ ] Working `/score_transaction` endpoint returning approve/review/block
