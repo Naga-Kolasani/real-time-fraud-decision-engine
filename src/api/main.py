@@ -1,15 +1,15 @@
 """
 FastAPI app for the Real-Time AI Fraud Decision Engine.
 
-Just /health for now. /score_transaction comes next.
+/health and /score_transaction.
 """
 
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from src.api.schemas import HealthResponse
-from src.models.infer import MODEL_VERSION, load_model_artifact
+from src.api.schemas import HealthResponse, ScoreResponse, TransactionRequest
+from src.models.infer import MODEL_VERSION, load_model_artifact, score_transaction
 
 
 @asynccontextmanager
@@ -34,3 +34,11 @@ def health() -> HealthResponse:
         model_name=app.state.artifact["model_name"],
         model_version=MODEL_VERSION,
     )
+
+
+@app.post("/score_transaction", response_model=ScoreResponse)
+def score_transaction_endpoint(
+    transaction: TransactionRequest,
+) -> ScoreResponse:
+    # Run one validated transaction through the saved model.
+    return score_transaction(transaction.model_dump())
