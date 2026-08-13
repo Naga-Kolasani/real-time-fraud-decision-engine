@@ -168,9 +168,6 @@ Day 1 (env, dataset, docs)
           -> Day 6 (README/demo/tests wrap all of it)
 ```
 
-If a day runs over, protect Day 4 (API) and Day 6 (docs/cleanup) first - a working API with
-an honest README beats a slightly better model with no way to show it off.
-
 ---
 
 ## Must-have list for Saturday
