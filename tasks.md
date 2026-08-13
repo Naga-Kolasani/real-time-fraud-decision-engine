@@ -75,7 +75,7 @@
 - [ ] 🟡 Check if SHAP is fast enough for the latency budget, or if it needs to be
   approximated
 
-**Done when:** tuned model saved, thresholds picked and written down with reasoning, `infer.py` has the core functions, and explainability is working in the notebook.
+**Done when:** a selected model artifact is saved, working thresholds are documented with reasoning, `infer.py` has the core scoring functions, and explainability is working in the notebook.
 
 ---
 

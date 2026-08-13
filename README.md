@@ -30,7 +30,7 @@ Rough scope:
 - Train a classifier (starting with logistic regression, then XGBoost) on a public transaction dataset.
 - Serve predictions through `POST /score_transaction` in FastAPI. Aiming for well under 50ms per request, but I haven't measured this yet.
 - Turn the raw fraud probability into approve / review / block using two thresholds.
-- Explain predictions with SHAP (planned - not implemented yet).
+- Explain predictions with SHAP: global feature importance plus local explanations for sample transactions.
 - Track training runs in MLflow.
 - Run the API in Docker.
 - Log predictions and do a basic drift check against the training data.
@@ -51,7 +51,7 @@ So instead of one threshold, there are two:
 | Review | Score in the middle | Gets flagged for manual review / extra auth |
 | Block | High risk score | Auto-declined |
 
-Current working thresholds are `T1 = 0.10` and `T2 = 0.89`, based on the validation threshold sweep. The raw sweep suggestion for `T1` was too low to be useful in practice because it pushed almost the entire validation set into the review band, so I raised the lower cutoff to keep the 3-way policy usable.
+Current working thresholds are `T1 = 0.10` and `T2 = 0.89`, based on the validation threshold sweep. The validation sweep was used to narrow down the working thresholds. The raw `T1` suggestion was `0.00`, which would send nearly every validation transaction to review, so I set `T1 = 0.10` to preserve a usable approve/review/block policy. `T2 = 0.89` remains the stricter boundary for auto-blocking.
 
 ---
 
@@ -95,7 +95,7 @@ Trained two initial models on the Kaggle credit card fraud dataset:
 - Logistic Regression with `class_weight="balanced"` as the simple baseline
 - XGBoost as the stronger tree-based model
 
-Because the dataset is extremely imbalanced, PR-AUC matter more than plain accuracy, so that's the main number I'm using to compare models right now.
+Because the dataset is extremely imbalanced, PR-AUC matters more than plain accuracy, so that's the main number I'm using to compare models right now.
 
 | Model | Precision | Recall | F1 | PR-AUC |
 |---|---|---|---|---|
@@ -116,7 +116,9 @@ Current implementation notes:
     - Current working thresholds in `src/models/infer.py` are `T1 = 0.10` and `T2 = 0.89`
     - These came from the validation threshold sweep, but I overrode the raw `T1 = 0.00` suggestion because it pushed almost the entire validation set into `review`
 - Explainability:
-    - SHAP is still planned for the next pass
+    - SHAP global importance and two local transaction explanations are in `notebooks/02_modeling.ipynb`
+    - The notebook saves plots to `artifacts/metrics/`
+    - I have SHAP working in the notebook, but haven't added it to the API response yet.
 - Experiment tracking:
     - MLflow, planned for Day 5 (runs stored locally in `mlruns/`, not committed to git)
 - Training code: [`src/models/train.py`](./src/models/train.py)
@@ -225,7 +227,7 @@ Full task breakdown in [`tasks.md`](./tasks.md). Where things stand:
 - [x] Day 1: repo scaffold, requirements.txt, README/ARCHITECTURE/tasks docs
 - [x] Day 1: pick dataset, download it, basic EDA
 - [x] Day 2: preprocessing pipeline + baseline model
-- [x] Day 3: tuned model, SHAP, and final threshold documentation
+- [x] Day 3: threshold analysis, inference logic, and SHAP explainability
 - [ ] Day 4: FastAPI service
 - [ ] Day 5: MLflow, Docker, monitoring
 - [ ] Day 6: docs, demo, cleanup
