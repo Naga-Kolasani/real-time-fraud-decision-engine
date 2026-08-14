@@ -10,6 +10,7 @@ from fastapi import FastAPI
 
 from src.api.schemas import HealthResponse, ScoreResponse, TransactionRequest
 from src.models.infer import MODEL_VERSION, load_model_artifact, score_transaction
+from src.monitoring.log_predictions import log_prediction
 
 
 @asynccontextmanager
@@ -37,8 +38,11 @@ def health() -> HealthResponse:
 
 
 @app.post("/score_transaction", response_model=ScoreResponse)
-def score_transaction_endpoint(
-    transaction: TransactionRequest,
-) -> ScoreResponse:
-    # Run one validated transaction through the saved model.
-    return score_transaction(transaction.model_dump())
+def score_transaction_endpoint(transaction: TransactionRequest) -> ScoreResponse:
+    """ Score one validated transaction and log the successful prediction. """
+    transaction_data = transaction.model_dump()
+    prediction = score_transaction(transaction_data)
+
+    log_prediction(transaction=transaction_data, prediction=prediction)
+
+    return prediction
