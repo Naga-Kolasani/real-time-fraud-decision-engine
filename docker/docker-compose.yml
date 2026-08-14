@@ -7,3 +7,5 @@ services:
     container_name: fraud-engine
     ports:
       - "8000:8000"
+    volumes:
+      - ../artifacts/logs:/app/artifacts/logs
