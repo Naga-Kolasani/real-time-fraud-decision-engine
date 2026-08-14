@@ -1,0 +1,9 @@
+services:
+  fraud-engine:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: fraud-engine:latest
+    container_name: fraud-engine
+    ports:
+      - "8000:8000"
