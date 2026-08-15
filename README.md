@@ -23,8 +23,7 @@ See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for the design and [`tasks.md`](./tas
 
 ## Overview
 
-The idea: build a small end-to-end fraud scoring system, not just a model in a notebook.
-Data pipeline, trained model, an API that serves it, some experiment tracking, a Dockerfile, and basic logging/drift checks. Nothing fancy - the point is to have a real working system I can point to and explain, not a from-scratch research project.
+This is a small end-to-end fraud scoring system, not just a model in a notebook. It includes a data pipeline, trained model, API, experiment tracking, Docker setup, and basic logging and drift checks. Nothing fancy. The point is to have a working system I can explain, not a from-scratch research project.
 
 Rough scope:
 - Train a classifier (starting with logistic regression, then XGBoost) on a public transaction dataset.
@@ -35,7 +34,7 @@ Rough scope:
 - Run the API in Docker.
 - Log predictions and do a basic drift check against the training data.
 
-Most of this is still TODO - see [`tasks.md`](./tasks.md) for what's actually done vs. planned.
+The core training, API, MLflow tracking, Docker deployment, prediction logging, and a lightweight drift check are implemented locally. See [`tasks.md`](./tasks.md) for the remaining documentation, demo, and cleanup work.
 
 ---
 
@@ -68,13 +67,13 @@ Rough flow (offline training -> online serving):
                                                           [FastAPI /score_transaction]
                                                                           |
                                                                           v
-                                                    [risk_score + decision + top_features]
+                                          [risk_score + decision + model_name + model_version + timestamp]
                                                                           |
                                                                           v
-                                              [prediction log] -> [drift check]
+                                                [prediction log] -> [drift check]
 ```
 
-TODO: replace this with an actual diagram image once the system is built (Day 6).
+A diagram image is a remaining documentation improvement; the flow above reflects the current implementation.
 
 ---
 
@@ -84,7 +83,7 @@ TODO: replace this with an actual diagram image once the system is built (Day 6)
 - Size: 284807 rows, 31 columns
 - Label distribution: 0.1727% fraudulent / 99.8273% non-fraudulent (highly imbalanced)
 - Key features: `Time`, `Amount`, `V1`-`V28` (PCA-anonymized features), `Class` (target)
-- License / usage notes: Public Kaggle dataset, for research/educational use. Features `V1`-`V28` are already PCA-transformed and anonymized by the dataset provider - no access to the original raw features.
+- License / usage notes: Public Kaggle dataset, for research/educational use. Features `V1`-`V28` are already PCA-transformed and anonymized by the dataset provider, so the original raw features are unavailable.
 - EDA notebook: [`notebooks/01_eda.ipynb`](./notebooks/01_eda.ipynb)
 
 ---
@@ -100,7 +99,7 @@ Because the dataset is extremely imbalanced, PR-AUC matters more than plain accu
 | Model | Precision | Recall | F1 | PR-AUC |
 |---|---|---|---|---|
 | Logistic Regression (baseline) | 0.0626 | 0.9082 | 0.1172 | 0.7190 |
-| XGBoost (tuned) | 0.7568 | 0.8571 | 0.8038 | 0.8688 |
+| XGBoost (selected) | 0.7568 | 0.8571 | 0.8038 | 0.8688 |
 
 A few takeaways from the first run:
 - Logistic Regression finds most fraud cases, but it throws way too many false positives.
@@ -120,7 +119,8 @@ Current implementation notes:
     - The notebook saves plots to `artifacts/metrics/`
     - I have SHAP working in the notebook, but haven't added it to the API response yet.
 - Experiment tracking:
-    - MLflow, planned for Day 5 (runs stored locally in `mlruns/`, not committed to git)
+    - MLflow records parameters, precision, recall, F1, PR-AUC, confusion-matrix JSON artifacts, and the winning `model_v1.pkl` artifact.
+    - Runs are stored locally in `mlruns/` under the `fraud-decision-engine` experiment and are not committed to Git.
 - Training code: [`src/models/train.py`](./src/models/train.py)
 
 The basic training pipeline is working end to end and producing a model artifact. I also have a separate threshold-sweep script now, which I used to pick the current working T1/T2 values before wiring them into inference.
@@ -165,11 +165,38 @@ Use the Swagger UI at `http://localhost:8000/docs` to send a real sample row fro
 
 ## Monitoring
 
-Not built yet (Day 5). Plan:
+Successful `POST /score_transaction` requests are appended as JSON Lines records to:
 
-- Every scored transaction gets appended to a log (CSV or SQLite, haven't decided) via `src/monitoring/log_predictions.py`
-- A separate script/notebook compares recent transaction features against the training distribution - either a hand-rolled check or Evidently, depending on time
-- Output is a basic report/plot saved locally, screenshotted for the README later
+```text
+artifacts/logs/predictions.jsonl
+```
+
+Each record includes:
+- `logged_at`
+- the validated 30-feature `transaction` payload
+- `risk_score`
+- `decision`
+- `model_name`
+- `model_version`
+- `prediction_timestamp`
+
+Requests rejected by FastAPI validation, such as a request missing `V28`, return HTTP 422 and are not logged.
+
+### Drift check
+
+Run the local PSI-based drift check on demand:
+
+```bash
+python -m src.monitoring.drift_checks
+```
+
+The script compares logged transaction values for `Amount`, `V1`, `V2`, `V3`, and `V4` against the original training distribution. It uses a PSI threshold of `0.20`, prints a per-feature summary, and writes a JSON report to:
+
+```text
+artifacts/metrics/drift_report.json
+```
+
+This is lightweight, local monitoring rather than a live dashboard or alerting system. The initial five-request repeated-payload demo intentionally produces alerts because it is not a representative production sample; it validates the monitoring pipeline rather than proving real-world data drift.
 
 ---
 
@@ -189,11 +216,22 @@ uvicorn src.api.main:app --reload --port 8000
 Then open `http://localhost:8000/docs` for the interactive API docs.
 
 ### Docker
+
+Build and run the API with Docker Compose:
+
 ```bash
-docker build -t fraud-engine -f docker/Dockerfile .
-docker run -p 8000:8000 fraud-engine
+docker compose -f docker/docker-compose.yml up --build
 ```
-(Dockerfile not written yet - planned for Day 5.)
+
+Open `http://localhost:8000/docs` to use the API.
+
+Stop and remove the container/network with:
+
+```bash
+docker compose -f docker/docker-compose.yml down
+```
+
+The Compose configuration bind-mounts `artifacts/logs/` into the container, so successful prediction logs remain on the host after the container is removed.
 
 ### Tests
 ```bash
@@ -205,7 +243,7 @@ Current coverage includes inference thresholds, feature-row validation, API heal
 ```bash
 mlflow ui --backend-store-uri ./mlruns
 ```
-Then open `http://localhost:5000`. (Nothing tracked yet.)
+Then open `http://localhost:5000` to inspect the local `fraud-decision-engine` experiment and its nested Logistic Regression and XGBoost runs.
 
 ---
 
@@ -218,18 +256,18 @@ Full task breakdown in [`tasks.md`](./tasks.md). Where things stand:
 - [x] Day 2: preprocessing pipeline + baseline model
 - [x] Day 3: threshold analysis, inference logic, and SHAP explainability
 - [x] Day 4: FastAPI service
-- [ ] Day 5: MLflow, Docker, monitoring
+- [x] Day 5: MLflow, Docker, monitoring
 - [ ] Day 6: docs, demo, cleanup
 
 ---
 
 ## Limitations & Future Work
 
-Writing this now so I remember to be upfront about it later, not just at the end:
+A few limits are worth being explicit about:
 
 - This uses a static dataset, not an actual real-time transaction stream. "Real-time" here means the API responds fast, not that it's hooked up to live data.
 - Drift monitoring is a manual/periodic check, not a live dashboard or alerting.
-- Thresholds are tuned on one dataset snapshot - would need to be re-checked against live data if this were ever actually deployed.
+- Thresholds were selected from one dataset snapshot and would need to be re-checked against live data before any real deployment.
 - No auth or rate limiting on the API. Fine for a local demo, not fine for production.
 
 See [`ARCHITECTURE.md`](./ARCHITECTURE.md#8-v1-scope-vs-stretch-scope) for what's in scope for this project vs. what I'm deliberately skipping.
@@ -238,6 +276,6 @@ See [`ARCHITECTURE.md`](./ARCHITECTURE.md#8-v1-scope-vs-stretch-scope) for what'
 
 ## Tech Stack
 
-Python 3.11, pandas, scikit-learn, XGBoost, imbalanced-learn, SHAP, FastAPI, Pydantic, MLflow, Docker, Evidently, pytest.
+Python 3.11, pandas, scikit-learn, XGBoost, imbalanced-learn, SHAP, FastAPI, Pydantic, MLflow, Docker, pytest, and a custom PSI-based drift check.
 
 Why each one is here: see [`ARCHITECTURE.md`](./ARCHITECTURE.md#10-tech-stack-rationale).

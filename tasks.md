@@ -1,7 +1,6 @@
 # 6-Day Build Plan
 
-🔴 = need this, 🟡 = if there's time,
-`needs:` = has to happen after something else.
+🔴 = need this, 🟡 = if there's time, `needs:` = has to happen after something else.
 
 ---
 
@@ -61,7 +60,7 @@
 
 **Tuning**
 - [ ] 🔴 Quick hyperparameter search on XGBoost (not exhaustive) - `needs:` Day 2 model
-- [ ] 🔴 Pick final model, balancing recall vs. false positives
+- [x] 🔴 Select XGBoost as the v1 model based on held-out PR-AUC and precision/recall tradeoffs
 
 **Thresholds**
 - [x] 🔴 `src/models/infer.py` - risk_score from predict_proba - `needs:` final model
@@ -72,8 +71,7 @@
 - [x] 🔴 SHAP global importance in `02_modeling.ipynb` - `needs:` final model
 - [x] 🔴 Local explanations for a few sample transactions
 - [ ] 🔴 Top-N feature function in `infer.py`
-- [ ] 🟡 Check if SHAP is fast enough for the latency budget, or if it needs to be
-  approximated
+- [ ] 🟡 Check if SHAP is fast enough for the latency budget, or if it needs to be approximated
 
 **Done when:** a selected model artifact is saved, working thresholds are documented with reasoning, `infer.py` has the core scoring functions, and explainability is working in the notebook.
 
@@ -104,34 +102,32 @@
 ## Day 5 - MLflow, Docker, monitoring
 
 **MLflow**
-- [ ] 🔴 Wire into `train.py` - log params/metrics/artifacts - `needs:` Day 2-3 training code
-- [ ] 🔴 Save model via MLflow logging
+- [x] 🔴 Wire into `train.py` - log params/metrics/artifacts - `needs:` Day 2-3 training code
+- [x] 🔴 Save model via MLflow logging
 - [ ] 🟡 Simple "production model" tag/config convention
 
 **Docker**
-- [ ] 🔴 `docker/Dockerfile` - `needs:` Day 4 working API
-- [ ] 🔴 Build + run locally
-- [ ] 🔴 Confirm `/health` and `/score_transaction` work inside the container
-- [ ] 🟡 `docker-compose.yml`
+- [x] 🔴 `docker/Dockerfile` - `needs:` Day 4 working API
+- [x] 🔴 Build + run locally
+- [x] 🔴 Confirm `/health` and `/score_transaction` work inside the container
+- [x] 🟡 `docker-compose.yml`
 
 **Monitoring**
-- [ ] 🔴 `src/monitoring/log_predictions.py` - `needs:` Day 4 API
-- [ ] 🔴 `drift_checks.py` or `03_monitoring_and_drift.ipynb` - `needs:` some logged
-  predictions to exist
-- [ ] 🔴 At least one drift plot/report saved to `artifacts/metrics/`
+- [x] 🔴 `src/monitoring/log_predictions.py` - `needs:` Day 4 API
+- [x] 🔴 `src/monitoring/drift_checks.py` - `needs:` logged predictions
+- [x] 🔴 At least one drift plot/report saved to `artifacts/metrics/`
 - [ ] 🟡 Evidently instead of hand-rolled checks, if time allows
 
-**Done when:** MLflow tracking runs, Docker image runs the API, predictions get logged, one
-drift check/report exists.
+**Done when:** MLflow tracking runs, the Docker image runs the API, successful predictions are logged, and one drift report can be generated locally.
 
 ---
 
 ## Day 6 - Docs, demo, cleanup
 
 **README**
-- [ ] 🔴 Fill in all the TODO sections with real content - `needs:` Days 1-5 done
+- [x] 🔴 Fill in all the TODO sections with real content - `needs:` Days 1-5 done
 - [ ] 🔴 Swap the ASCII diagram for a real image
-- [ ] 🔴 Real metrics in the model table
+- [x] 🔴 Real metrics in the model table
 - [ ] 🔴 Real curl examples with actual output
 
 **Demo material**
@@ -143,8 +139,7 @@ drift check/report exists.
 **Cleanup**
 - [ ] 🔴 Run full pytest suite, fix failures
 - [ ] 🔴 Double check no data files or secrets got committed
-- [ ] 🔴 Fresh clone, follow my own README from scratch, make sure it actually works -
-  `needs:` everything else done
+- [ ] 🔴 Fresh clone, follow my own README from scratch, make sure it actually works - `needs:` everything else done
 - [ ] 🟡 GitHub Actions running pytest on push
 
 **Wrap-up**
@@ -152,8 +147,7 @@ drift check/report exists.
 - [ ] 🔴 Pin the repo
 - [ ] 🟡 Short LinkedIn post
 
-**Done when:** README matches reality, tests pass on a clean checkout, Docker works, repo is
-ready to link somewhere.
+**Done when:** README matches reality, tests pass on a clean checkout, Docker works, repo is ready to link somewhere.
 
 ---
 
@@ -172,11 +166,11 @@ Day 1 (env, dataset, docs)
 
 ## Must-have list by Day 6
 
-- [ ] Trained model with real metrics written down
-- [ ] Working `/score_transaction` endpoint returning approve/review/block
-- [ ] README that matches what's actually built
-- [ ] Dockerfile that runs the API with one command
-- [ ] Prediction logging + at least one drift check
-- [ ] MLflow tracking on the training runs
-- [ ] pytest passes
+- [x] Trained model with real metrics written down
+- [x] Working `/score_transaction` endpoint returning approve/review/block
+- [x] README that matches what's actually built
+- [x] Dockerfile that runs the API with one command
+- [x] Prediction logging + at least one drift check
+- [x] MLflow tracking on the training runs
+- [x] pytest passes
 - [ ] Resume bullets + pinned repo
