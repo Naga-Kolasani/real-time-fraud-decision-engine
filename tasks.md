@@ -128,7 +128,7 @@
 - [x] 🔴 Fill in all the TODO sections with real content - `needs:` Days 1-5 done
 - [ ] 🔴 Swap the ASCII diagram for a real image
 - [x] 🔴 Real metrics in the model table
-- [ ] 🔴 Real curl examples with actual output
+- [x] 🔴 Real curl examples with actual output
 
 **Demo material**
 - [ ] 🔴 Screenshot: architecture diagram
