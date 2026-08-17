@@ -303,10 +303,16 @@ pytest tests/
 Current coverage includes inference thresholds, feature-row validation, API health, a valid scoring request, and an invalid scoring request. Run `pytest tests/` to see the current test count.
 
 ### MLflow UI
+
 ```bash
 mlflow ui --backend-store-uri ./mlruns
 ```
+
 Then open `http://localhost:5000` to inspect the local `fraud-decision-engine` experiment and its nested Logistic Regression and XGBoost runs.
+
+MLflow captures the parent training run, nested model runs, and their model-selection metric:
+
+![MLflow experiment tracking with nested model runs and PR-AUC](./docs/images/mlflow-experiment-tracking.jpg)
 
 ---
 
