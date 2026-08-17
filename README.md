@@ -208,6 +208,10 @@ Example response:
 
 The timestamp changes on every request.
 
+Example response from the interactive Swagger UI:
+
+![Successful transaction score response](./docs/images/api-score-response.jpg)
+
 Run the API locally:
 
 ```bash
@@ -287,6 +291,10 @@ docker compose -f docker/docker-compose.yml down
 ```
 
 The Compose configuration bind-mounts `artifacts/logs/` into the container, so successful prediction logs remain on the host after the container is removed.
+
+Containerized API run, successful score request, and persisted prediction log:
+
+![Docker API run and prediction log](./docs/images/docker-api-and-prediction-log.jpg)
 
 ### Tests
 ```bash
