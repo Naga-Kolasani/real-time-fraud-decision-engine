@@ -70,7 +70,7 @@
 **Explainability**
 - [x] 🔴 SHAP global importance in `02_modeling.ipynb` - `needs:` final model
 - [x] 🔴 Local explanations for a few sample transactions
-- [ ] 🔴 Top-N feature function in `infer.py`
+- [x] 🔴 Top-N global feature-importance helper in `src/models/infer.py`
 - [ ] 🟡 Check if SHAP is fast enough for the latency budget, or if it needs to be approximated
 
 **Done when:** a selected model artifact is saved, working thresholds are documented with reasoning, `infer.py` has the core scoring functions, and explainability is working in the notebook.

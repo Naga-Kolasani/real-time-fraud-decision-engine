@@ -100,26 +100,37 @@ def score_transaction(transaction: dict) -> dict:
     }
 
 
-def get_top_features(transaction: dict, n: int = 5, artifact: dict = None) -> list[dict]:
+def get_top_features(n: int = 5, artifact: dict = None) -> list[dict]:
     """
-    Return the top N features contributing to a transaction's risk score.
+    Return the top N global feature importances from the selected tree model.
 
-    This will eventually use SHAP values from the saved model, but it is not wired in yet.
-    The notebook explainability pass is done; the API version still needs a real latency check before this gets called per request.
-
-    Args:
-        transaction: Raw feature dict for one transaction.
-        n: Number of features to return.
-        artifact: Optional pre-loaded model artifact.
-
-    Returns:
-        List of dicts like:
-        [
-            {"feature": "V14", "contribution": 0.42},
-            {"feature": "Amount", "contribution": -0.18},
-        ]
+    These values rank features across the model as a whole. They are not transaction-specific explanations or SHAP contributions.
     """
-    raise NotImplementedError("Top feature explanations are not wired into infer.py yet.")
+    if n < 1:
+        raise ValueError("n must be at least 1")
+
+    if artifact is None:
+        artifact = load_model_artifact()
+
+    model = artifact["model"]
+    feature_columns = artifact["feature_columns"]
+
+    if not hasattr(model, "feature_importances_"):
+        raise ValueError(
+            f"Model {artifact['model_name']} does not expose feature_importances_."
+        )
+
+    importances = model.feature_importances_
+    ranked = sorted(
+        zip(feature_columns, importances),
+        key=lambda item: item[1],
+        reverse=True,
+    )
+
+    return [
+        {"feature": feature, "importance": round(float(importance), 6)}
+        for feature, importance in ranked[:n]
+    ]
 
 
 if __name__ == "__main__":
