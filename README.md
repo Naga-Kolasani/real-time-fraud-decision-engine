@@ -309,7 +309,7 @@ Containerized API run, successful score request, and persisted prediction log:
 ```bash
 pytest tests/
 ```
-Current coverage includes inference thresholds, feature-row validation, API health, a valid scoring request, and an invalid scoring request. Run `pytest tests/` to see the current test count.
+Current coverage includes inference thresholds, feature-row validation, API health, a valid scoring request, and an invalid scoring request. The current test suite passes with `11 passed`.
 
 ### MLflow UI
 
