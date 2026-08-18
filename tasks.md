@@ -137,9 +137,9 @@
 - [ ] 🟡 Short screen recording walking through it
 
 **Cleanup**
-- [ ] 🔴 Run full pytest suite, fix failures
+- [x] 🔴 Run full pytest suite, fix failures
 - [x] 🔴 Double check no data files or secrets got committed
-- [ ] 🔴 Fresh clone, follow my own README from scratch, make sure it actually works - `needs:` everything else done
+- [x] 🔴 Fresh clone, follow my own README from scratch, make sure it actually works - `needs:` everything else done
 - [ ] 🟡 GitHub Actions running pytest on push
 
 **Wrap-up**
