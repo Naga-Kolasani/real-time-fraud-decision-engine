@@ -279,8 +279,34 @@ This is lightweight, local monitoring rather than a live dashboard or alerting s
 python -m venv .venv
 source .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
+```
+
+### Data and model bootstrap
+
+The dataset and trained model artifact are intentionally excluded from Git.
+
+1. Download `creditcard.csv` from [Kaggle's Credit Card Fraud Detection dataset](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud).
+2. Create the local data directory and place the file at `data/creditcard.csv`:
+
+```bash
+mkdir -p data
+# Move the downloaded file to:
+# data/creditcard.csv
+```
+
+3. Train the models to create `artifacts/models/model_v1.pkl`:
+
+```bash
+python -m src.models.train
+```
+
+After training completes, run the complete test suite and start the API:
+
+```bash
+python -m pytest tests/ -v
 uvicorn src.api.main:app --reload --port 8000
 ```
+
 Then open `http://localhost:8000/docs` for the interactive API docs.
 
 ### Docker
