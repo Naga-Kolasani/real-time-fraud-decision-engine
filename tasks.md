@@ -132,7 +132,7 @@
 
 **Demo material**
 - [ ] 🔴 Screenshot: architecture diagram
-- [ ] 🔴 Screenshot: notebook plots (feature importance, confusion matrix, drift report)
+- [x] 🔴 Screenshot: notebook plots (feature importance and threshold sweep)
 - [x] 🔴 Screenshot: API call + response
 - [ ] 🟡 Short screen recording walking through it
 

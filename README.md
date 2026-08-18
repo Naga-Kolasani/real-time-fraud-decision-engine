@@ -118,12 +118,21 @@ Current implementation notes:
     - SHAP global importance and two local transaction explanations are in `notebooks/02_modeling.ipynb`
     - The notebook saves plots to `artifacts/metrics/`
     - I have SHAP working in the notebook, but haven't added it to the API response yet.
+
+Global SHAP feature importance for the selected XGBoost model:
+
+![Global SHAP feature importance](./docs/images/shap_global_importance.jpg)
+
 - Experiment tracking:
     - MLflow records parameters, precision, recall, F1, PR-AUC, confusion-matrix JSON artifacts, and the winning `model_v1.pkl` artifact.
     - Runs are stored locally in `mlruns/` under the `fraud-decision-engine` experiment and are not committed to Git.
 - Training code: [`src/models/train.py`](./src/models/train.py)
 
 The basic training pipeline is working end to end and producing a model artifact. I also have a separate threshold-sweep script now, which I used to pick the current working T1/T2 values before wiring them into inference.
+
+The threshold sweep was used to select the current approval, review, and block policy boundaries:
+
+![Precision and recall across decision thresholds](./docs/images/threshold_sweep.jpg)
 
 ---
 
