@@ -138,13 +138,13 @@
 
 **Cleanup**
 - [ ] 🔴 Run full pytest suite, fix failures
-- [ ] 🔴 Double check no data files or secrets got committed
+- [x] 🔴 Double check no data files or secrets got committed
 - [ ] 🔴 Fresh clone, follow my own README from scratch, make sure it actually works - `needs:` everything else done
 - [ ] 🟡 GitHub Actions running pytest on push
 
 **Wrap-up**
-- [ ] 🔴 1-2 resume bullets
-- [ ] 🔴 Pin the repo
+- [x] 🔴 1-2 resume bullets
+- [x] 🔴 Pin the repo
 - [ ] 🟡 Short LinkedIn post
 
 **Done when:** README matches reality, tests pass on a clean checkout, Docker works, repo is ready to link somewhere.
@@ -173,4 +173,4 @@ Day 1 (env, dataset, docs)
 - [x] Prediction logging + at least one drift check
 - [x] MLflow tracking on the training runs
 - [x] pytest passes
-- [ ] Resume bullets + pinned repo
+- [x] Resume bullets + pinned repo
