@@ -59,7 +59,7 @@
 ## Day 3 - Tuning, thresholds, explainability
 
 **Tuning**
-- [ ] 🔴 Quick hyperparameter search on XGBoost (not exhaustive) - `needs:` Day 2 model
+- [x] 🔴 Quick hyperparameter search on XGBoost (not exhaustive) - `needs:` Day 2 model
 - [x] 🔴 Select XGBoost as the v1 model based on held-out PR-AUC and precision/recall tradeoffs
 
 **Thresholds**

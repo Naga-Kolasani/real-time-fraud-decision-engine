@@ -101,6 +101,8 @@ Because the dataset is extremely imbalanced, PR-AUC matters more than plain accu
 | Logistic Regression (baseline) | 0.0626 | 0.9082 | 0.1172 | 0.7190 |
 | XGBoost (selected) | 0.7568 | 0.8571 | 0.8038 | 0.8688 |
 
+A small eight-configuration XGBoost search selected a validation PR-AUC of 0.8063, but its held-out test PR-AUC (0.8596) did not exceed the original configuration's 0.8688. The project therefore retains the original XGBoost parameters for v1.
+
 A few takeaways from the first run:
 - Logistic Regression finds most fraud cases, but it throws way too many false positives.
 - XGBoost is much more usable as a starting point: recall is still strong, precision is dramatically better, and it wins clearly on PR-AUC.
